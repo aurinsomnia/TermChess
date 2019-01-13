@@ -54,14 +54,18 @@ Types of Move:
 
 
 */
-
-#define ANSI_COLOR_WHITE		 "\x1b[37m"
-#define ANSI_COLOR_WHITE		 "\x1b[30m"
-#define ANSI_COLOR_RESET		 "\x1b[0m"
+#define ANSI_BACKGROUND_DARK_GRAY 	"\x1b[100m"
+#define ANSI_BACKGROUND_LIGHT_GRAY  "\x1b[47m"
+#define ANSI_COLOR_WHITE		 				"\x1b[37m"
+#define ANSI_COLOR_BRIGHT_WHITE 		"\x1b[97m"
+#define ANSI_COLOR_BLACK						"\x1b[30m"
+#define ANSI_COLOR_RED							"\x1b[31m"
+#define ANSI_COLOR_RESET		 				"\x1b[0m"
+#define ANSI_BOLD 									"\x1b[1m"
 enum Color 
 {
 	WHITE = 0,
-	BLACK = 4
+	BLACK = 1
 };
 
 enum Piece
@@ -275,7 +279,7 @@ public:
 	void PrintBoard()
 	{
 		std::cout << "  ";
-		for (int x = 0; x < 17; x++)
+		for (int x = 0; x < 16; x++)
 		{
 			std::cout << "_";
 		}
@@ -285,74 +289,115 @@ public:
 			std::cout << 8 - i << " ";
 			for (int j = 0; j < 8; j++)
 			{
-				printf(ANSI_COLOR_WHITE " " ANSI_COLOR_RESET);
-				PrintPiece(gameBoardShort[i][j]);
+		//		printf(ANSI_BACKGROUND_LIGHT_GRAY " " ANSI_COLOR_RESET);
+		/*		if (i % 2 == 0)
+				{
+					if (j % 2 == 0)
+					{
+						printf(ANSI_BACKGROUND_LIGHT_GRAY "  " ANSI_COLOR_RESET);
+					}
+					else {
+						printf(ANSI_BACKGROUND_DARK_GRAY "  " ANSI_COLOR_RESET);
+					}
+				}
+				else {
+					if (j % 2 == 0)
+					{
+						printf(ANSI_BACKGROUND_DARK_GRAY);
+						printf("%*c" ANSI_COLOR_RESET, 2, 'a' );
+					}
+					else {
+						printf(ANSI_BACKGROUND_LIGHT_GRAY "  " ANSI_COLOR_RESET);
+					}
+
+				}
+			//	PrintPiece(gameBoardShort[i][j]);
+			}*/
+				PrintSquare(gameBoardShort[i][j]);
 			}
-			std::cout << "|" << std::endl;
+			std::cout << std::endl;
 		}
 		std::cout << "   A B C D E F G H" << std::endl;
 	}
 
-	void PrintPiece(unsigned short piece)
+	char PrintPiece(unsigned short tmp)
 	{
-		bool white = true;
-		unsigned short tmp = piece & 0xf;
-		if (tmp % 2 == 1)
-		{
-			white = false;
-		}
-		tmp = tmp >> 1;
 		switch (tmp)
 		{
 		case PAWN:
 		{
-			if (white)
-				std::cout << "P";
-			else
-				std::cout << "p";
-			break;
+			return 'P';
 		}
 		case KNIGHT: {
-			if (white)
-				std::cout << "H";
-			else
-				std::cout << "h";
-			break;
+			return 'N';
 		}
 		case BISHOP: {
-			if (white)
-				std::cout << "B";
-			else
-				std::cout << "b";
-			break;
+			return 'B';
 		}
 		case ROOK: {
-			if (white)
-				std::cout << "R";
-			else
-				std::cout << "r";
-			break;
+			return 'R';
 		}
 		case QUEEN: {
-			if (white)
-				std::cout << "Q";
-			else
-				std::cout << "q";
-			break;
+			return 'Q';
 		}
 		case KING: {
-			if (white)
-				std::cout << "K";
-			else
-				std::cout << "k";
-			break;
+			return 'K';
 		}
 		default:
-			std::cout << "_";
+			return ' ';
 			break;
 		}
 	}
 
+	void PrintSquare(unsigned short squareval)
+	{
+		bool white = true;
+		unsigned short pieceval = squareval & 0xf;
+		if (pieceval % 2 == 1)
+		{
+			white = false;
+		}
+		pieceval = pieceval >> 1;
+		char c = PrintPiece(pieceval);
+		unsigned short rowval = squareval & 0x0f00;
+		unsigned short colval = squareval & 0x00f0;
+		rowval = rowval >> 8;
+		colval = colval >> 4;
+		if (white == true)
+		{
+			if (rowval % 2 == 0)
+			{
+				if (colval % 2 == 0)
+					printf(ANSI_BACKGROUND_LIGHT_GRAY ANSI_BOLD ANSI_COLOR_BRIGHT_WHITE "%*c" ANSI_COLOR_RESET, 2, c);
+				else
+					printf(ANSI_BACKGROUND_DARK_GRAY  ANSI_COLOR_BRIGHT_WHITE "%*c" ANSI_COLOR_RESET, 2, c);
+			}
+			else 
+			{
+				if (colval % 2 == 0)
+					printf(ANSI_BACKGROUND_DARK_GRAY  ANSI_COLOR_BRIGHT_WHITE "%*c" ANSI_COLOR_RESET, 2, c);
+				else
+					printf(ANSI_BACKGROUND_LIGHT_GRAY ANSI_BOLD ANSI_COLOR_BRIGHT_WHITE "%*c" ANSI_COLOR_RESET, 2, c);
+			}
+		}
+		else {
+			if (rowval % 2 == 0)
+			{
+				if (colval % 2 == 0)
+					printf(ANSI_BACKGROUND_LIGHT_GRAY ANSI_BOLD ANSI_COLOR_BLACK "%*c" ANSI_COLOR_RESET, 2, c);
+				else
+					printf(ANSI_BACKGROUND_DARK_GRAY  ANSI_COLOR_BLACK "%*c" ANSI_COLOR_RESET, 2, c);
+			}
+			else 
+			{
+				if (colval % 2 == 0)
+					printf(ANSI_BACKGROUND_DARK_GRAY  ANSI_COLOR_BLACK "%*c" ANSI_COLOR_RESET, 2, c);
+				else
+					printf(ANSI_BACKGROUND_LIGHT_GRAY ANSI_BOLD ANSI_COLOR_BLACK "%*c" ANSI_COLOR_RESET, 2, c);
+			}
+		}
+
+	}
 	void PrintHexBoardValues()
 	{
 		std::cout << std::endl;
@@ -396,6 +441,10 @@ class Player
 {
 
 };
+void PollInput()
+{
+	
+}
 
 
 
@@ -407,6 +456,12 @@ int main()
 	GamesBoard board;
 	board.PrintBoard();
 	board.movePiece(0, 3, 5, 6);
+	printf("\x1b[2J"); // erase display
 	board.PrintBoard();
-//	board.PrintHexBoardValues();
+	bool gameOver = false;
+	while (gameOver != true)
+	{
+		
+	}
+
 }
